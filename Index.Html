@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yayaking Pool</title>
+<style>
+  body { margin:0; background:#0b3d0b; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; }
+  canvas { background:#1a5c1a; border:12px solid #4a2c17; border-radius:10px; touch-action:none; }
+</style>
+</head>
+<body>
+<canvas id="table" width="320" height="600"></canvas>
+<script>
+const canvas = document.getElementById('table');
+const ctx = canvas.getContext('2d');
+let balls = [
+  {x:160, y:500, r:12, color:'white', vx:0, vy:0},
+  {x:160, y:150, r:12, color:'red', vx:0, vy:0}
+];
+let dragStart = null;
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  balls.forEach(b=>{
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+  });
+}
+function update() {
+  balls.forEach(b=>{
+    b.x += b.vx; b.y += b.vy;
+    b.vx *= 0.98; b.vy *= 0.98;
+    if (b.x<b.r||b.x>canvas.width-b.r) b.vx*=-1;
+    if (b.y<b.r||b.y>canvas.height-b.r) b.vy*=-1;
+  });
+  draw();
+  requestAnimationFrame(update);
+}
+canvas.addEventListener('touchstart', e=>{
+  dragStart = {x:e.touches[0].clientX, y:e.touches[0].clientY};
+});
+canvas.addEventListener('touchend', e=>{
+  if(!dragStart) return;
+  let dx = dragStart.x - e.changedTouches[0].clientX;
+  let dy = dragStart.y - e.changedTouches[0].clientY;
+  balls[0].vx = dx*0.2;
+  balls[0].vy = dy*0.2;
+  dragStart = null;
+});
+update();
+</script>
+</body>
+</html>
